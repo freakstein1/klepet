@@ -16,8 +16,40 @@ function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
   sporocilo = dodajSmeske(sporocilo);
   var sistemskoSporocilo;
-
-  if (sporocilo.charAt(0) == '/') {
+  
+  var povezavaNaSliko;
+  if (sporocilo.indexOf('http://') > -1){
+    var zacetekURL = sporocilo.indexOf('https://');
+    if(sporocilo.indexOf('.jpg') > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.jpg')+4);
+      prikaziSliko(povezavaNaSliko);
+    }
+    else if(sporocilo.indexOf('.png') > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.png')+4);
+      prikaziSliko(povezavaNaSliko);
+    }
+    else if(sporocilo.indexOf('.gif') > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.gif')+4);
+      prikaziSliko(povezavaNaSliko);
+    }
+  } 
+  else if (sporocilo.indexOf('https://') > -1) {
+    var zacetekURL = sporocilo.indexOf('https://');
+    if(sporocilo.indexOf('.jpg') > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.jpg')+4);
+      prikaziSliko(povezavaNaSliko);
+    }
+    else if(sporocilo.indexOf('.png') > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.png')+4);
+      prikaziSliko(povezavaNaSliko);
+    }
+    else if(sporocilo.indexOf('.gif') > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.gif')+4);
+      prikaziSliko(povezavaNaSliko);
+    }
+  }
+  
+    if (sporocilo.charAt(0) == '/') {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
     if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
@@ -30,6 +62,16 @@ function procesirajVnosUporabnika(klepetApp, socket) {
   }
 
   $('#poslji-sporocilo').val('');
+}
+
+function prikaziSliko(src) {
+    var img = document.createElement("img");
+    img.src = src;
+    img.width = 200;
+    img.alt = 'slika';
+
+    img.style.marginLeft = "20px";
+    $('#sporocila').append(img);
 }
 
 var socket = io.connect();
