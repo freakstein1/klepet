@@ -28,6 +28,14 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     $('#sporocila').append(divElementEnostavniTekst(sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   }
+  
+  if(sporocilo.indexOf('https://www.youtube.com/watch?v=') > -1) {
+    var zacetekYoutubeLinka = sporocilo.indexOf('https://www.youtube.com/watch?v=');
+    var konecYoutubeLinka = zacetekYoutubeLinka + 32;
+    while(sporocilo.charAt(konecYoutubeLinka) != " " || sporocilo.charAt(konecYoutubeLinka) != sporocilo.length-1) {
+      konecYoutubeLinka = konecYoutubeLinka + 1; 
+    }
+  }
 
   $('#poslji-sporocilo').val('');
 }
