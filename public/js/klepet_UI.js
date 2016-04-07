@@ -17,43 +17,15 @@ function procesirajVnosUporabnika(klepetApp, socket) {
   sporocilo = dodajSmeske(sporocilo);
   var sistemskoSporocilo;
   
-  var povezavaNaSliko;
-  if (sporocilo.indexOf('http://') > -1){
-    var zacetekURL = sporocilo.indexOf('https://');
-    if(sporocilo.indexOf('.jpg') > -1) {
-      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.jpg')+4);
-      prikaziSliko(povezavaNaSliko);
-    }
-    else if(sporocilo.indexOf('.png') > -1) {
-      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.png')+4);
-      prikaziSliko(povezavaNaSliko);
-    }
-    else if(sporocilo.indexOf('.gif') > -1) {
-      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.gif')+4);
-      prikaziSliko(povezavaNaSliko);
-    }
-  } 
-  else if (sporocilo.indexOf('https://') > -1) {
-    var zacetekURL = sporocilo.indexOf('https://');
-    if(sporocilo.indexOf('.jpg') > -1) {
-      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.jpg')+4);
-      prikaziSliko(povezavaNaSliko);
-    }
-    else if(sporocilo.indexOf('.png') > -1) {
-      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.png')+4);
-      prikaziSliko(povezavaNaSliko);
-    }
-    else if(sporocilo.indexOf('.gif') > -1) {
-      povezavaNaSliko = sporocilo.substring(zacetekURL,sporocilo.indexOf('.gif')+4);
-      prikaziSliko(povezavaNaSliko);
-    }
-  }
-  
-    if (sporocilo.charAt(0) == '/') {
+  if (sporocilo.charAt(0) == '/') {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
     if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
     }
+  } else if (jeSlikaHttp(sporocilo) || jeSlikaHttps(sporocilo)){
+    klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
+    $('#sporocila').append(elementPrikaziSliko(sporocilo));
+    $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
@@ -64,14 +36,66 @@ function procesirajVnosUporabnika(klepetApp, socket) {
   $('#poslji-sporocilo').val('');
 }
 
-function prikaziSliko(src) {
-    var img = document.createElement("img");
-    img.src = src;
-    img.width = 200;
-    img.alt = 'slika';
+function jeSlikaHttp(sporocilo) {
+  if (sporocilo.indexOf('http://') > -1){
+    if(sporocilo.indexOf('.jpg') > -1) {
+      return true;
+    }
+    else if(sporocilo.indexOf('.png') > -1) {
+      return true;
+    }
+    else if(sporocilo.indexOf('.gif') > -1) {
+      return true;
+    }
+  } 
+  return false;
+}
 
-    img.style.marginLeft = "20px";
-    $('#sporocila').append(img);
+function jeSlikaHttps(sporocilo) {
+  if (sporocilo.indexOf('https://') > -1){
+    if(sporocilo.indexOf('.jpg') > -1) {
+      return true;
+    }
+    else if(sporocilo.indexOf('.png') > -1) {
+      return true;
+    }
+    else if(sporocilo.indexOf('.gif') > -1) {
+      return true;
+    }
+  } 
+  return false;
+}
+
+function elementPrikaziSliko(sporocilo) {
+  var povezavaNaSliko;
+  var zacetekURL;
+  var konecURL;
+  if (jeSlikaHttps(sporocilo)) {
+    zacetekURL = sporocilo.indexOf('https://');
+    if((konecURL = sporocilo.indexOf('.jpg')) > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
+    }
+    else if((konecURL = sporocilo.indexOf('.png')) > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
+    }
+    else if((konecURL = sporocilo.indexOf('.gif')) > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
+    }
+  } else if(jeSlikaHttp(sporocilo)) {
+    zacetekURL = sporocilo.indexOf('http://');
+    if((konecURL = sporocilo.indexOf('.jpg')) > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
+    }
+    else if((konecURL = sporocilo.indexOf('.png')) > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
+    }
+    else if((konecURL = sporocilo.indexOf('.gif')) > -1) {
+      povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
+    }
+  }
+  $('#sporocila').append(divElementEnostavniTekst(sporocilo.substring(0,zacetekURL)+sporocilo.substring(konecURL+4,sporocilo.length)));
+  povezavaNaSliko = '<img src="' + povezavaNaSliko + '" width="200" style="margin-left:20px">';
+  return $('<div></div>').html(povezavaNaSliko);
 }
 
 var socket = io.connect();
@@ -116,7 +140,12 @@ $(document).ready(function() {
   });
 
   socket.on('sporocilo', function (sporocilo) {
-    var novElement = divElementEnostavniTekst(sporocilo.besedilo);
+    var novElement;
+    if(jeSlikaHttp(sporocilo.besedilo) || jeSlikaHttps(sporocilo.besedilo)) {
+      novElement = elementPrikaziSliko(sporocilo.besedilo);
+    } else {
+      novElement = divElementEnostavniTekst(sporocilo.besedilo);
+    }
     $('#sporocila').append(novElement);
   });
   
