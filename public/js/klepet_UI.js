@@ -12,6 +12,27 @@ function divElementHtmlTekst(sporocilo) {
   return $('<div></div>').html('<i>' + sporocilo + '</i>');
 }
 
+function elementYoutubeVideo(sporocilo) {
+  var zacetekURL = sporocilo.indexOf('https://www.youtube.com/watch?v=');
+  var patt = new RegExp('https:\/\/www\.youtube\.com\/watch\[?]v=[^\\s]+');
+  var videoURL = patt.exec(sporocilo);
+  videoURL = videoURL.toString();
+  videoURL = videoURL.substring(32,videoURL.length);
+  var konecURL = zacetekURL + 32 + videoURL.length;
+  $('#sporocila').append(divElementEnostavniTekst(sporocilo.substring(0,zacetekURL)+sporocilo.substring(konecURL,sporocilo.length)));
+  videoURL = '<iframe src="https://www.youtube.com/embed/' + videoURL +  '"width="200" height="150" style="margin-left:20px" allowfullscreen></iframe>';
+  return $('<div></div>').html(videoURL);
+}
+
+function jeVideo(sporocilo) {
+  var patt = new RegExp('https:\/\/www\.youtube\.com\/watch\[?]v=[^\\s]+');
+  if(patt.test(sporocilo)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
   sporocilo = dodajSmeske(sporocilo);
@@ -22,19 +43,15 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
     }
+  } else if(jeVideo(sporocilo)) {
+    klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
+    $('#sporocila').append(elementYoutubeVideo(sporocilo));
+    $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight')); 
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(divElementEnostavniTekst(sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
-  }
-  
-  if(sporocilo.indexOf('https://www.youtube.com/watch?v=') > -1) {
-    var zacetekYoutubeLinka = sporocilo.indexOf('https://www.youtube.com/watch?v=');
-    var konecYoutubeLinka = zacetekYoutubeLinka + 32;
-    while(sporocilo.charAt(konecYoutubeLinka) != " " || sporocilo.charAt(konecYoutubeLinka) != sporocilo.length-1) {
-      konecYoutubeLinka = konecYoutubeLinka + 1; 
-    }
   }
 
   $('#poslji-sporocilo').val('');
@@ -82,7 +99,12 @@ $(document).ready(function() {
   });
 
   socket.on('sporocilo', function (sporocilo) {
-    var novElement = divElementEnostavniTekst(sporocilo.besedilo);
+    var novElement;
+    if (jeVideo(sporocilo.besedilo)) {
+      novElement = elementYoutubeVideo(sporocilo.besedilo);
+    } else {
+      novElement = divElementEnostavniTekst(sporocilo.besedilo);
+    }
     $('#sporocila').append(novElement);
   });
   
