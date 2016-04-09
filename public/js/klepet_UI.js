@@ -93,7 +93,7 @@ function elementPrikaziSliko(sporocilo) {
       povezavaNaSliko = sporocilo.substring(zacetekURL,konecURL+4);
     }
   }
-  $('#sporocila').append(divElementEnostavniTekst(sporocilo.substring(0,zacetekURL)+sporocilo.substring(konecURL+4,sporocilo.length)));
+  $('#sporocila').append(divElementEnostavniTekst(sporocilo));
   povezavaNaSliko = '<img src="' + povezavaNaSliko + '" width="200" style="margin-left:20px">';
   return $('<div></div>').html(povezavaNaSliko);
 }
