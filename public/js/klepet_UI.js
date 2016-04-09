@@ -13,13 +13,11 @@ function divElementHtmlTekst(sporocilo) {
 }
 
 function elementYoutubeVideo(sporocilo) {
-  var zacetekURL = sporocilo.indexOf('https://www.youtube.com/watch?v=');
   var patt = new RegExp('https:\/\/www\.youtube\.com\/watch\[?]v=[^\\s]+');
   var videoURL = patt.exec(sporocilo);
   videoURL = videoURL.toString();
   videoURL = videoURL.substring(32,videoURL.length);
-  var konecURL = zacetekURL + 32 + videoURL.length;
-  $('#sporocila').append(divElementEnostavniTekst(sporocilo.substring(0,zacetekURL)+sporocilo.substring(konecURL,sporocilo.length)));
+  $('#sporocila').append(divElementEnostavniTekst(sporocilo));
   videoURL = '<iframe src="https://www.youtube.com/embed/' + videoURL +  '"width="200" height="150" style="margin-left:20px" allowfullscreen></iframe>';
   return $('<div></div>').html(videoURL);
 }
