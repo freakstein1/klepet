@@ -12,6 +12,25 @@ function divElementHtmlTekst(sporocilo) {
   return $('<div></div>').html('<i>' + sporocilo + '</i>');
 }
 
+function elementYoutubeVideo(sporocilo) {
+  var patt = new RegExp('https:\/\/www\.youtube\.com\/watch\[?]v=[^\\s]+');
+  var videoURL = patt.exec(sporocilo);
+  videoURL = videoURL.toString();
+  videoURL = videoURL.substring(32,videoURL.length);
+  $('#sporocila').append(divElementEnostavniTekst(sporocilo));
+  videoURL = '<iframe src="https://www.youtube.com/embed/' + videoURL +  '"width="200" height="150" style="margin-left:20px" allowfullscreen></iframe>';
+  return $('<div></div>').html(videoURL);
+}
+
+function jeVideo(sporocilo) {
+  var patt = new RegExp('https:\/\/www\.youtube\.com\/watch\[?]v=[^\\s]+');
+  if(patt.test(sporocilo)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
   sporocilo = dodajSmeske(sporocilo);
@@ -26,6 +45,10 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(elementPrikaziSliko(sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
+  } else if(jeVideo(sporocilo)) {
+    klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
+    $('#sporocila').append(elementYoutubeVideo(sporocilo));
+    $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight')); 
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
@@ -100,6 +123,9 @@ $(document).ready(function() {
     var novElement;
     if(jeSlika(sporocilo.besedilo)) {
       novElement = elementPrikaziSliko(sporocilo.besedilo);
+    }
+    else if (jeVideo(sporocilo.besedilo)) {
+      novElement = elementYoutubeVideo(sporocilo.besedilo);
     } else {
       novElement = divElementEnostavniTekst(sporocilo.besedilo);
     }
