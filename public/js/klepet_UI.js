@@ -37,7 +37,7 @@ function procesirajVnosUporabnika(klepetApp, socket) {
 }
 
 function jeSlika(sporocilo) {
-  var patt = new RegExp('(https:\/\/|https:\/\/)[^\\s]+(.jpg|.png|.gif)');
+  var patt = new RegExp('(http:\/\/|https:\/\/)[^\\s]+(.jpg|.png|.gif)','g');
   if(patt.test(sporocilo)) {
     return true;
   } else {
@@ -47,7 +47,7 @@ function jeSlika(sporocilo) {
 
 function elementPrikaziSliko(sporocilo) {
   var povezavaNaSliko;
-  var patt = new RegExp('(https:\/\/|https:\/\/)[^\\s]+(.jpg|.png|.gif)');
+  var patt = new RegExp('(http:\/\/|https:\/\/)[^\\s]+(.jpg|.png|.gif)','g');
   povezavaNaSliko = patt.exec(sporocilo);
   povezavaNaSliko = povezavaNaSliko.toString();
   $('#sporocila').append(divElementEnostavniTekst(sporocilo));
