@@ -1,0 +1,1 @@
+Študent z vpisno ševilko _63110319_ potrjujem, da sem __edini avtor__ oddane domače naloge.
