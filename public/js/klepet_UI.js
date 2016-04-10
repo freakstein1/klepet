@@ -24,6 +24,7 @@ function elementYoutubeVideo(sporocilo) {
 
 function jeVideo(sporocilo) {
   var patt = new RegExp('https:\/\/www\.youtube\.com\/watch\[?]v=[^\\s]+');
+  
   if(patt.test(sporocilo)) {
     return true;
   } else {
